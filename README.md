@@ -1,36 +1,77 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# AI Frontdesk
 
-## Getting Started
+AI Frontdesk is a local-first Next.js voice concierge for ski rental bookings. It listens to guests, asks for missing booking details, stores completed bookings in PostgreSQL, and plays an instant local Bella voice pack for the greeting and follow-up prompts.
 
-First, run the development server:
+## What is in the app
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+- Voice booking flow in `app/page.tsx`
+- Concierge API backed by local Ollama in `app/api/concierge/route.ts`
+- Booking persistence in PostgreSQL through `lib/bookings.ts` and `lib/db.ts`
+- Free local Kokoro voice pack in `public/voice-pack/bella`
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Project layout
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+`app/`
+: Next.js UI and API routes.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+`db/`
+: PostgreSQL schema used by the bookings table.
 
-## Learn More
+`lib/`
+: Shared booking and voice helpers.
 
-To learn more about Next.js, take a look at the following resources:
+`public/`
+: Background video and committed local voice assets.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+`scripts/`
+: Local database and voice generation utilities.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Local setup
 
-## Deploy on Vercel
+1. Install dependencies:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+   `npm install`
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+2. Create a local env file from the example:
+
+   `cp .env.example .env.local`
+
+3. Update `DATABASE_URL` with your local PostgreSQL password.
+
+4. Make sure Ollama is running locally:
+
+   `ollama serve`
+
+5. Start or update the bookings database:
+
+   `npm run db:migrate`
+
+6. Start the app:
+
+   `npm run dev`
+
+Open [http://localhost:3000](http://localhost:3000).
+
+## Scripts
+
+- `npm run dev` starts the app
+- `npm run build` creates a production build
+- `npm run db:migrate` creates the database and applies `db/schema.sql`
+- `npm run db:list` prints recent bookings from PostgreSQL
+- `npm run voice:generate -- --force` regenerates the committed Bella voice pack
+
+## Environment variables
+
+`DATABASE_URL`
+: Local PostgreSQL connection string.
+
+`OLLAMA_BASE_URL`
+: Ollama server URL. Defaults to `http://127.0.0.1:11434`.
+
+`OLLAMA_MODEL`
+: Ollama model name. Defaults to `llama3.2:latest`.
+
+## Notes
+
+- The repo already includes the current local Bella voice pack used by the app.
+- Completed bookings are available at `GET /api/bookings` and in DBeaver through the `bookings` table.
